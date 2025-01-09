@@ -1,7 +1,3 @@
-# Code for ETL operations on Country-GDP data
-
-# Importing the required libraries
-
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
@@ -28,10 +24,11 @@ def extract(url, table_attribs):
 def transform(df, csv_path):
     read_csv = pd.read_csv(csv_path)
     df['MC_USD_Billion'] = df.iloc[:,1].astype(float)
-    exchange_rate_dict = read_csv.set_index('Currency')['Rate'].to_dict()
+    exchange_rate_dict = read_csv.set_index('currency')['rate'].to_dict()
     df['MC_GBP_Billion'] = [np.round(x*exchange_rate_dict['GBP'],2) for x in df['MC_USD_Billion']]
     df['MC_EUR_Billion'] = [np.round(x*exchange_rate_dict['EUR'],2) for x in df['MC_USD_Billion']]
     df['MC_INR_Billion'] = [np.round(x*exchange_rate_dict['INR'],2) for x in df['MC_USD_Billion']]
+    df['MC_IDR_Billion'] = [np.round(x*exchange_rate_dict['IDR'],2) for x in df['MC_USD_Billion']]
 	
     return df
 
@@ -47,8 +44,8 @@ def run_query(query_statement, sql_connection):
 	print(query_output)
 
 def log_progress(message): 
-    timestamp_format = '%Y-%h-%d-%H:%M:%S' # Year-Monthname-Day-Hour-Minute-Second 
-    now = datetime.now() # get current timestamp 
+    timestamp_format = '%Y-%h-%d-%H:%M:%S'
+    now = datetime.now()
     timestamp = now.strftime(timestamp_format) 
     with open("./code_log.txt","a") as f: 
         f.write(timestamp + ' : ' + message + '\n')
